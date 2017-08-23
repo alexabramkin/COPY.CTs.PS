@@ -9,13 +9,14 @@
 
  function LoadAndConnectToSharePoint($url)
  {
-  Add-Type -Path "..\SharePoint Assemblies\Microsoft.SharePoint.Client.dll"
-  Add-Type -Path "..\SharePoint Assemblies\Microsoft.SharePoint.Client.Runtime.dll"
-  Add-Type -Path "..\SharePoint Assemblies\Microsoft.SharePoint.Client.Taxonomy.dll"
+   #Install-Package Microsoft.SharePointOnline.CSOM -Version 16.1.6802.1200 
+  Add-Type -Path "C:\Program Files\WindowsPowerShell\Modules\SharePointPnPPowerShellOnline\2.17.1708.1\Microsoft.SharePoint.Client.dll"
+  Add-Type -Path "C:\Program Files\WindowsPowerShell\Modules\SharePointPnPPowerShellOnline\2.17.1708.1\Microsoft.SharePoint.Client.Runtime.dll"
+  Add-Type -Path "C:\Program Files\WindowsPowerShell\Modules\SharePointPnPPowerShellOnline\2.17.1708.1\Microsoft.SharePoint.Client.Taxonomy.dll"
   
   ##Using PnP library
-  Connect-SPOnline -Url $SiteUrl #-CurrentCredentials
-  $spContext =  Get-SPOContext
+  Connect-PnPOnline -Url $SiteUrl #-CurrentCredentials
+  $spContext =  Get-PnPContext
   return $spContext
 }
 
@@ -28,7 +29,7 @@ $xmlFilePath = (get-location).ToString() + "\$XMLTermsFileName"
 [xml]$fieldsXML = Get-Content($xmlFilePath)
 
    $fieldsXML.Fields.Field | ForEach-Object {
-   $field = Get-SPOField  -Identity $_.ID -ErrorAction SilentlyContinue
+   $field = Get-PnPField  -Identity $_.ID -ErrorAction SilentlyContinue
    if($field -eq $null)
     {
      $fieldName = $_.Name   
@@ -45,8 +46,8 @@ $xmlFilePath = (get-location).ToString() + "\$XMLTermsFileName"
          foreach($childNode in $ChildNodes) {$childNode.ParentNode.RemoveChild($childNode)}
       }
 
-      Add-SPOFieldFromXml -FieldXml $_.OuterXml
-      $field = Get-SPOField  -Identity $_.ID
+      Add-PnPFieldFromXml -FieldXml $_.OuterXml
+      $field = Get-PnPField  -Identity $_.ID
         if($_.Type -eq 'TaxonomyFieldTypeMulti' -or $_.Type -eq 'TaxonomyFieldType')
         {
           try
